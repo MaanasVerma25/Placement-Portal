@@ -12,6 +12,7 @@ import { AuthPage } from "@/pages/AuthPage";
 import { AuthCallback } from "@/pages/AuthCallback";
 import { CompanyIntelligence } from "@/pages/CompanyIntelligence";
 import { SkillIntelligence } from "@/pages/SkillIntelligence";
+import { CandidateProfilePage } from "@/pages/CandidateProfilePage";
 import { NotFound } from "@/pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -62,6 +63,15 @@ export function App() {
                     <Route path="intelligence" element={<CompanyIntelligence />} />
                     <Route path="skills" element={<SkillIntelligence />} />
                   </Route>
+
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <CandidateProfilePage />
+                      </ProtectedRoute>
+                    }
+                  />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>

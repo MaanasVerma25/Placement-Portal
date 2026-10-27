@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
-import { Building2, Sparkles, ArrowLeft, Menu, X, ChevronRight, Layers } from "lucide-react";
+import { Building2, Sparkles, ArrowLeft, Menu, X, ChevronRight, Layers, User } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
 import { CompanyLogo } from "@/components/CompanyLogo";
 
@@ -160,6 +160,28 @@ export const AppSidebar: React.FC = () => {
               </span>
             </NavLink>
           ))}
+
+          <div className="pt-3 px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            Candidate Profile
+          </div>
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-[#EFF6FF] text-[#2563EB] font-semibold border border-blue-100/80 shadow-xs"
+                  : "text-[#334155] hover:bg-slate-200/50 hover:text-slate-900"
+              }`
+            }
+          >
+            <div className="flex items-center gap-3">
+              <User className="w-4 h-4 shrink-0 text-blue-600" />
+              <span>My Profile & Skills</span>
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold">
+              RADIX
+            </span>
+          </NavLink>
         </div>
 
         {/* Footer: All Companies link (NO user profile, NO logout) */}
