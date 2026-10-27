@@ -135,3 +135,28 @@ export function getEmailValidationError(email: string): string | null {
 
   return null;
 }
+
+/**
+ * Returns the proper callback redirect URL for Supabase Auth.
+ * Supports VITE_SITE_URL environment override, deployed Vercel domain, or window.location.origin.
+ */
+export function getAuthRedirectUrl(path: string = "/auth/callback"): string {
+  const customSiteUrl = import.meta.env.VITE_SITE_URL || import.meta.env.VITE_PUBLIC_SITE_URL;
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
+  // If explicitly configured in .env or Vercel environment variables
+  if (customSiteUrl) {
+    return `${customSiteUrl.replace(/\/+$/, "")}${cleanPath}`;
+  }
+
+  // If running in browser and on a non-localhost domain (like Vercel)
+  if (typeof window !== "undefined" && window.location.origin) {
+    const origin = window.location.origin;
+    if (!origin.includes("localhost") && !origin.includes("127.0.0.1")) {
+      return `${origin}${cleanPath}`;
+    }
+  }
+
+  // Production fallback for Vercel
+  return `https://placement-portal-lime-iota.vercel.app${cleanPath}`;
+}

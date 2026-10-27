@@ -5,6 +5,7 @@ import {
   isCollegeEmail,
   parseStudentEmail,
   getEmailValidationError,
+  getAuthRedirectUrl,
   ParsedStudentInfo,
 } from "@/lib/authUtils";
 import { StudentResume } from "@/types/resume";
@@ -316,7 +317,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             batch_years: parsedInfo.batchYears || null,
             admission_year: parsedInfo.admissionYear || null,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: getAuthRedirectUrl("/auth/callback"),
         },
       });
 
@@ -337,7 +338,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim().toLowerCase(),
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: getAuthRedirectUrl("/auth/callback"),
         },
       });
 
@@ -377,7 +378,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.resetPasswordForEmail(
         email.trim().toLowerCase(),
         {
-          redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+          redirectTo: getAuthRedirectUrl("/auth/callback?type=recovery"),
         }
       );
       return { error };
