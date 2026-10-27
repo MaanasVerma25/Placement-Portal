@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { Menu, ChevronRight } from "lucide-react";
 import { SidebarProvider, AppSidebar, useSidebar } from "./AppSidebar";
 import { useCompany } from "@/context/CompanyContext";
+import { StudentUserMenu } from "@/components/auth/StudentUserMenu";
 
 const AppHeader: React.FC = () => {
   const { toggleSidebar } = useSidebar();
@@ -41,11 +42,12 @@ const AppHeader: React.FC = () => {
         </nav>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
           JSS Placement Intelligence
         </span>
+        <StudentUserMenu />
       </div>
     </header>
   );

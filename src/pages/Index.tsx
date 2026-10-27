@@ -3,6 +3,7 @@ import { Search, X, Building2, Sparkles, RefreshCw, AlertCircle } from "lucide-r
 import { useCompanies } from "@/lib/companyApi";
 import { CompanyCard } from "@/components/CompanyCard";
 import { CATEGORY_COLORS } from "@/components/Badges";
+import { StudentUserMenu } from "@/components/auth/StudentUserMenu";
 
 const COLLEGE_NAME = "JSS UNIVERSITY";
 const COLLEGE_SHORT = "JSS";
@@ -79,11 +80,12 @@ export const Index: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
               <span>Phase 1 Verified</span>
             </span>
+            <StudentUserMenu />
           </div>
         </div>
       </header>
