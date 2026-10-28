@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Link } from "react-router-dom";
+import React, { useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   GraduationCap,
@@ -14,9 +14,18 @@ import {
   Hash,
   Database,
   Calendar,
+  Edit3,
+  Trophy,
+  Award,
+  X,
+  ChevronRight,
+  CheckCircle2,
+  Target,
+  Lock,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileView } from "@/components/profile/CandidateProfileView";
+import { ManualProfileForm } from "@/components/profile/ManualProfileForm";
 import {
   formatFileSize,
   downloadResumeFile,
@@ -39,6 +48,15 @@ export const CandidateProfilePage: React.FC = () => {
     updateProfile,
   } = useAuth();
 
+  const [searchParams] = useSearchParams();
+  const isNewUser =
+    searchParams.get("onboarding") === "true" ||
+    searchParams.get("new") === "true";
+  const [isManualMode, setIsManualMode] = useState(false);
+  const [showOnboardingHero, setShowOnboardingHero] = useState(
+    isNewUser || (!resume && !candidateProfile)
+  );
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +74,8 @@ export const CandidateProfilePage: React.FC = () => {
     const result = await uploadResume(file);
     if (result.success) {
       toast.success("Resume uploaded! Extracting features...", { id: toastId });
+      setShowOnboardingHero(false);
+      setIsManualMode(false);
     } else {
       toast.error("Upload failed", { id: toastId, description: result.error });
     }
@@ -131,10 +151,135 @@ export const CandidateProfilePage: React.FC = () => {
 
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* Onboarding Welcome Banner / Card */}
+        {showOnboardingHero && (
+          <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            {/* Background accent decorations */}
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/3 -mb-20 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 space-y-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1.5 max-w-2xl text-left">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[11px] font-bold">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Candidate Profile Onboarding</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold font-heading text-white tracking-tight">
+                    Welcome to JSS Placement Hub,{" "}
+                    {student?.username ? student.username.toUpperCase() : "Student"}!
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    Set up your placement dossier to qualify for upcoming campus recruitment drives. Top tech recruiters filter candidates based on their technical skills, hackathons, certifications, and RADIX framework ratings.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowOnboardingHero(false)}
+                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer shrink-0"
+                  title="Dismiss banner"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Two Option Cards: Upload Resume vs Manual Entry */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                {/* Option 1: Upload Resume with AI Autofill */}
+                <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 hover:border-blue-400/50 transition-all flex flex-col justify-between space-y-4 group text-left">
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/30 group-hover:scale-105 transition-transform">
+                        <UploadCloud className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                        ⚡ Recommended · Fastest
+                      </span>
+                    </div>
+
+                    <h3 className="text-sm font-bold text-white font-heading">
+                      Upload Resume (Autofill with AI)
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Upload your PDF or Word resume. Our AI automatically extracts your contact details, education, projects, hackathons, and certifications, and scores your 12 RADIX categories in seconds.
+                    </p>
+
+                    <div className="space-y-1 text-[11px] text-blue-200">
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Autofills 12 RADIX Competency Ladders</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Detects Hackathons & Certifications</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isResumeLoading}
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-600/30 transition-all cursor-pointer"
+                  >
+                    <UploadCloud className="w-4 h-4" />
+                    <span>{isResumeLoading ? "Uploading..." : "Upload Resume (PDF / DOCX)"}</span>
+                  </button>
+                </div>
+
+                {/* Option 2: Enter Details Manually */}
+                <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 hover:border-indigo-400/50 transition-all flex flex-col justify-between space-y-4 group text-left">
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+                        <Edit3 className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                        Structured Form
+                      </span>
+                    </div>
+
+                    <h3 className="text-sm font-bold text-white font-heading">
+                      I Don&apos;t Have a Resume
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Don&apos;t have a formatted resume ready? No worries! Enter your academic info, skills, projects, hackathons, and certifications manually in our step-by-step form.
+                    </p>
+
+                    <div className="space-y-1 text-[11px] text-indigo-200">
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Interactive sliders for 12 RADIX skills</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Custom hackathons & badges entry</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsManualMode(true);
+                      setShowOnboardingHero(false);
+                    }}
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-900 bg-white hover:bg-slate-100 shadow-md transition-all cursor-pointer"
+                  >
+                    <Edit3 className="w-4 h-4 text-indigo-600" />
+                    <span>Enter Details Manually →</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Profile Dossier Header Banner */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 text-left">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white font-bold text-xl flex items-center justify-center shrink-0 shadow-md shadow-blue-600/20">
                 {student?.branchCode ? student.branchCode.slice(0, 2) : "JS"}
               </div>
@@ -156,10 +301,18 @@ export const CandidateProfilePage: React.FC = () => {
                     {student.branchName} · JSS University Noida
                   </p>
                 )}
+                {candidateProfile?.preferredRole && (
+                  <div className="pt-0.5">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-semibold">
+                      <Target className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Preferred Role: {candidateProfile.preferredRole}</span>
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Resume Action Bar */}
+            {/* Resume & Profile Action Bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
               <input
                 type="file"
@@ -168,6 +321,19 @@ export const CandidateProfilePage: React.FC = () => {
                 accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword"
                 className="hidden"
               />
+
+              <button
+                type="button"
+                onClick={() => setIsManualMode(!isManualMode)}
+                className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  isManualMode
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 shadow-2xs"
+                }`}
+              >
+                <Edit3 className="w-3.5 h-3.5 text-blue-600" />
+                <span>{isManualMode ? "View Profile View" : "Manual Profile Form"}</span>
+              </button>
 
               {resume ? (
                 <div className="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 border border-slate-200">
@@ -217,7 +383,7 @@ export const CandidateProfilePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
                 >
                   <UploadCloud className="w-4 h-4" />
                   <span>Upload Resume (PDF / DOCX)</span>
@@ -229,7 +395,7 @@ export const CandidateProfilePage: React.FC = () => {
                   type="button"
                   onClick={handleManualReextract}
                   disabled={isParsingResume}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{isParsingResume ? "Extracting..." : "Re-Extract Profile"}</span>
@@ -239,16 +405,30 @@ export const CandidateProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Candidate Profile View Section */}
+        {/* Candidate Profile View or Manual Form Container */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-          <CandidateProfileView
-            profile={candidateProfile}
-            isParsing={isParsingResume}
-            parsingStatus={parsingStatus}
-            onSave={updateProfile}
-            onReextract={handleManualReextract}
-            hasResume={Boolean(resume)}
-          />
+          {isManualMode ? (
+            <ManualProfileForm
+              initialData={candidateProfile}
+              user={user}
+              student={student}
+              onSave={async (updated) => {
+                await updateProfile(updated);
+                setIsManualMode(false);
+              }}
+              onCancel={() => setIsManualMode(false)}
+              isInitialOnboarding={isNewUser}
+            />
+          ) : (
+            <CandidateProfileView
+              profile={candidateProfile}
+              isParsing={isParsingResume}
+              parsingStatus={parsingStatus}
+              onSave={updateProfile}
+              onReextract={handleManualReextract}
+              hasResume={Boolean(resume)}
+            />
+          )}
         </div>
       </main>
     </div>

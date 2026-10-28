@@ -202,6 +202,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
 
       profile.extractionSource = source;
+      // Preferred role is manually set only - preserve existing selection if present
+      if (candidateProfile?.preferredRole) {
+        profile.preferredRole = candidateProfile.preferredRole;
+      }
 
       // 3. Save to database & cache
       setParsingStatus("Saving autofilled profile features to database...");

@@ -4,6 +4,7 @@ import {
   extractResumeText,
   saveCandidateProfileToDatabase,
   loadCandidateProfileFromDatabase,
+  deleteCandidateProfileFromDatabase,
 } from "@/lib/resumeParserService";
 import { CandidateProfile } from "@/types/candidateProfile";
 
@@ -41,13 +42,19 @@ describe("Resume Parser & Candidate Profile Service", () => {
   });
 
   describe("saveCandidateProfileToDatabase & loadCandidateProfileFromDatabase", () => {
-    it("persists and retrieves candidate profile from local storage and database cache", async () => {
+    it("persists and retrieves all candidate profile fields including preferredRole and hackathons", async () => {
       const mockProfile: CandidateProfile = {
         userId: "test-user-456",
         fullName: "Aman Verma",
         email: "j25cse108@jssuninoida.edu.in",
+        phone: "+91 9876543210",
         headline: "Frontend & Full Stack Engineer | React & Node.js",
+        preferredRole: "Full Stack Software Engineer",
         summary: "Passionate developer with expertise in algorithms and React web development.",
+        location: "Noida, UP",
+        linkedinUrl: "https://linkedin.com/in/amanverma",
+        githubUrl: "https://github.com/amanverma",
+        portfolioUrl: "https://amanverma.dev",
         education: [
           {
             id: "edu_1",
@@ -90,8 +97,35 @@ describe("Resume Parser & Candidate Profile Service", () => {
             technologies: ["React", "TypeScript", "Tailwind CSS"],
           },
         ],
-        experience: [],
-        certifications: [],
+        experience: [
+          {
+            id: "exp_1",
+            company: "Tech Solutions",
+            role: "Software Engineering Intern",
+            startDate: "June 2024",
+            endDate: "August 2024",
+            description: "Built performant backend microservices.",
+          },
+        ],
+        certifications: [
+          {
+            id: "cert_1",
+            name: "AWS Certified Developer",
+            issuer: "Amazon Web Services",
+            issueDate: "2024",
+          },
+        ],
+        hackathons: [
+          {
+            id: "hack_1",
+            name: "Smart India Hackathon",
+            projectName: "AI Health Monitor",
+            awardOrPosition: "Winner",
+            date: "2024",
+          },
+        ],
+        resumeFileName: "Aman_Verma_Resume.pdf",
+        extractionSource: "direct_text",
         updatedAt: new Date().toISOString(),
       };
 
@@ -101,8 +135,64 @@ describe("Resume Parser & Candidate Profile Service", () => {
       const loaded = await loadCandidateProfileFromDatabase("test-user-456");
       expect(loaded).toBeDefined();
       expect(loaded?.fullName).toBe("Aman Verma");
+      expect(loaded?.preferredRole).toBe("Full Stack Software Engineer");
+      expect(loaded?.phone).toBe("+91 9876543210");
+      expect(loaded?.location).toBe("Noida, UP");
+      expect(loaded?.linkedinUrl).toBe("https://linkedin.com/in/amanverma");
+      expect(loaded?.githubUrl).toBe("https://github.com/amanverma");
+      expect(loaded?.portfolioUrl).toBe("https://amanverma.dev");
       expect(loaded?.skills.radixSkills.length).toBe(2);
       expect(loaded?.projects[0].title).toBe("Campus Placement Intelligence Hub");
+      expect(loaded?.experience[0].company).toBe("Tech Solutions");
+      expect(loaded?.certifications[0].name).toBe("AWS Certified Developer");
+      expect(loaded?.hackathons?.[0].name).toBe("Smart India Hackathon");
+      expect(loaded?.hackathons?.[0].awardOrPosition).toBe("Winner");
+      expect(loaded?.resumeFileName).toBe("Aman_Verma_Resume.pdf");
+
+      // Verify deletion cleans up local storage
+      const delRes = await deleteCandidateProfileFromDatabase("test-user-456");
+      expect(delRes.success).toBe(true);
+      const afterDelete = await loadCandidateProfileFromDatabase("test-user-456");
+      expect(afterDelete).toBeNull();
+    });
+  });
+
+  describe("generateHeuristicProfileFromText", () => {
+    it("extracts skills, hackathons, and certifications from text", async () => {
+      const { generateHeuristicProfileFromText } = await import(
+        "@/lib/resumeParserService"
+      );
+
+      const sampleResume = `
+        Aman Sharma
+        Email: j25cse108@jssuninoida.edu.in
+        Phone: +91 9876543210
+        Education: B.Tech Computer Science & Engineering 8.8 CGPA JSS University
+        Skills: Python, TypeScript, React, PostgreSQL, Docker, AWS, Git
+        Certifications:
+        - AWS Certified Solutions Architect by Amazon Web Services
+        - Coursera Machine Learning Specialization
+        Hackathons:
+        - Smart India Hackathon (SIH) 2024 Winner 1st Place
+        - HackCBS 6.0 Finalist
+      `;
+
+      const profile = generateHeuristicProfileFromText(
+        sampleResume,
+        {
+          userId: "user-789",
+          userEmail: "j25cse108@jssuninoida.edu.in",
+          studentName: "Aman Sharma",
+          branchName: "Computer Science",
+        },
+        "Aman_Resume.pdf"
+      );
+
+      expect(profile.userId).toBe("user-789");
+      expect(profile.skills.rawTechnicalSkills).toContain("Python");
+      expect(profile.skills.rawTechnicalSkills).toContain("React");
+      expect(profile.certifications.length).toBeGreaterThan(0);
+      expect(profile.hackathons && profile.hackathons.length > 0).toBe(true);
     });
   });
 });

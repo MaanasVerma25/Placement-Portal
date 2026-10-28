@@ -38,6 +38,17 @@ export interface CertificationEntry {
   credentialUrl?: string;
 }
 
+export interface HackathonEntry {
+  id: string;
+  name: string;
+  projectName?: string;
+  roleOrTeam?: string;
+  awardOrPosition?: string; // e.g. "Winner", "1st Runner Up", "Finalist", "Top 10", "Participant"
+  date?: string;
+  description?: string;
+  projectUrl?: string;
+}
+
 export interface RadixSkillMapping {
   skillSetId: number;
   shortName: string;
@@ -62,6 +73,7 @@ export interface CandidateProfile {
   phone?: string;
   location?: string;
   headline?: string;
+  preferredRole?: string;
   summary?: string;
   portfolioUrl?: string;
   linkedinUrl?: string;
@@ -71,6 +83,7 @@ export interface CandidateProfile {
   projects: ProjectEntry[];
   experience: ExperienceEntry[];
   certifications: CertificationEntry[];
+  hackathons?: HackathonEntry[];
   extractedAt?: string;
   extractionSource?: "direct_text" | "ocr" | "manual";
   resumeFileName?: string;

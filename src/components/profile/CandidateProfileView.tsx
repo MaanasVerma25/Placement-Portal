@@ -13,8 +13,13 @@ import {
   Database,
   RefreshCw,
   FileText,
+  Award,
+  Trophy,
+  Target,
+  Lock,
 } from "lucide-react";
 import { CandidateProfile } from "@/types/candidateProfile";
+import { ManualProfileForm } from "./ManualProfileForm";
 import { toast } from "sonner";
 
 interface CandidateProfileViewProps {
@@ -37,7 +42,9 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<CandidateProfile | null>(profile);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "skills" | "projects" | "education" | "experience">("skills");
+  const [activeTab, setActiveTab] = useState<
+    "skills" | "projects" | "education" | "experience" | "certifications" | "hackathons"
+  >("skills");
 
   // Keep local state in sync when profile updates
   React.useEffect(() => {
@@ -63,26 +70,53 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({
     );
   }
 
+  // If in editing mode, display the comprehensive ManualProfileForm
+  if (isEditing) {
+    return (
+      <ManualProfileForm
+        initialData={formData || profile}
+        onSave={async (updated) => {
+          if (onSave) {
+            await onSave(updated);
+          }
+          setFormData(updated);
+          setIsEditing(false);
+        }}
+        onCancel={() => setIsEditing(false)}
+      />
+    );
+  }
+
   if (!profile) {
     return (
       <div className="py-10 px-4 rounded-2xl bg-slate-50 border border-dashed border-slate-300 text-center">
         <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-200/80 text-slate-500 flex items-center justify-center">
           <FileText className="w-6 h-6" />
         </div>
-        <h4 className="text-sm font-bold text-slate-800">No Profile Features Extracted Yet</h4>
-        <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-4">
-          Upload your resume in PDF or DOCX format to automatically extract your education, projects, experience, and 12 RADIX skills.
+        <h4 className="text-sm font-bold text-slate-800">No Profile Features Detected Yet</h4>
+        <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-5">
+          Upload your resume in PDF/DOCX format to automatically extract your skills, hackathons, and certifications with AI, or enter your details manually.
         </p>
-        {hasResume && onReextract && (
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {hasResume && onReextract && (
+            <button
+              type="button"
+              onClick={onReextract}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Autofill Profile with AI</span>
+            </button>
+          )}
           <button
             type="button"
-            onClick={onReextract}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors"
+            onClick={() => setIsEditing(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 shadow-2xs transition-colors cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Extract & Autofill with AI</span>
+            <Edit3 className="w-3.5 h-3.5 text-blue-600" />
+            <span>Enter Details Manually</span>
           </button>
-        )}
+        </div>
       </div>
     );
   }
@@ -122,6 +156,26 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({
             )}
           </div>
           <p className="text-xs text-blue-200">{currentData.headline}</p>
+
+          {currentData.preferredRole ? (
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/30 text-blue-200 border border-blue-400/30">
+                <Target className="w-3.5 h-3.5 text-blue-300" />
+                <span>Preferred Role: {currentData.preferredRole}</span>
+              </span>
+            </div>
+          ) : (
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-300 hover:text-white transition-colors cursor-pointer"
+              >
+                <Target className="w-3.5 h-3.5 text-blue-400" />
+                <span>+ Set Preferred Role (Manual Only)</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -236,21 +290,51 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({
           <Briefcase className="w-3.5 h-3.5" />
           <span>Experience ({currentData.experience?.length || 0})</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("certifications")}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all shrink-0 ${
+            activeTab === "certifications"
+              ? "bg-white text-emerald-700 shadow-xs"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <Award className="w-3.5 h-3.5" />
+          <span>Certifications ({currentData.certifications?.length || 0})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("hackathons")}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all shrink-0 ${
+            activeTab === "hackathons"
+              ? "bg-white text-amber-700 shadow-xs"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <Trophy className="w-3.5 h-3.5" />
+          <span>Hackathons ({currentData.hackathons?.length || 0})</span>
+        </button>
       </div>
 
       {/* Tab 1: 12 RADIX SKILLS MATRIX */}
       {activeTab === "skills" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 font-heading">
                 <Layers className="w-3.5 h-3.5 text-blue-600" />
                 RADIX Skill Categories (12 Placement Competency Ladders)
               </h4>
               <p className="text-[11px] text-slate-500">
-                Mapped against public.skill_set_master and skill_set_topics from Supabase.
+                Objective competency framework evaluated from verified resume projects and artifacts.
               </p>
             </div>
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 self-start sm:self-center">
+              <Lock className="w-3 h-3 text-slate-500" />
+              Verified Competencies · Non-Editable
+            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -280,6 +364,9 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span className="text-[10px] font-bold font-mono text-slate-500">
                         Level {score}/10
+                      </span>
+                      <span title="Assessed by AI from resume; non-editable">
+                        <Lock className="w-2.5 h-2.5 text-slate-400" />
                       </span>
                       <div className="w-12 h-1.5 rounded-full bg-slate-200 overflow-hidden">
                         <div
@@ -502,6 +589,205 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({
                 </div>
               </div>
             ))
+          )}
+        </div>
+      )}
+
+      {/* Tab 5: CERTIFICATIONS */}
+      {activeTab === "certifications" && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 font-heading">
+                <Award className="w-4 h-4 text-emerald-600" />
+                Verified & Recognized Certifications
+              </h4>
+              <p className="text-[11px] text-slate-500">
+                Industry credentials and skill badges from AWS, Google, Coursera, NPTEL, Cisco, etc.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+            >
+              <Edit3 className="w-3 h-3" />
+              <span>Edit / Add</span>
+            </button>
+          </div>
+
+          {!currentData.certifications || currentData.certifications.length === 0 ? (
+            <div className="p-8 text-center text-xs text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-300 space-y-2">
+              <Award className="w-8 h-8 text-slate-400 mx-auto" />
+              <p className="font-semibold text-slate-700">No certifications listed yet.</p>
+              <p className="text-[11px] text-slate-400">
+                Showcase your AWS, Google Cloud, Coursera, or HackerRank certificates to boost your placement score.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-2xs transition-colors"
+              >
+                <span>Add Certification</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {currentData.certifications.map((cert, idx) => (
+                <div
+                  key={cert.id || idx}
+                  className="p-4 rounded-xl border border-emerald-200/90 bg-gradient-to-br from-white to-emerald-50/30 shadow-2xs space-y-2 flex flex-col justify-between"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                          <Award className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h5 className="text-xs font-bold text-slate-900 leading-tight">
+                            {cert.name}
+                          </h5>
+                          <span className="text-[11px] font-semibold text-emerald-700">
+                            {cert.issuer}
+                          </span>
+                        </div>
+                      </div>
+
+                      {cert.issueDate && (
+                        <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 shrink-0">
+                          {cert.issueDate}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {cert.credentialUrl && (
+                    <div className="pt-2 border-t border-emerald-100/80 flex items-center justify-end">
+                      <a
+                        href={cert.credentialUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Verify Credential</span>
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab 6: HACKATHONS */}
+      {activeTab === "hackathons" && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 font-heading">
+                <Trophy className="w-4 h-4 text-amber-500" />
+                Hackathons & Competitive Achievements
+              </h4>
+              <p className="text-[11px] text-slate-500">
+                National and collegiate hackathon awards, project prototypes, and rankings.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 transition-colors"
+            >
+              <Edit3 className="w-3 h-3" />
+              <span>Edit / Add</span>
+            </button>
+          </div>
+
+          {!currentData.hackathons || currentData.hackathons.length === 0 ? (
+            <div className="p-8 text-center text-xs text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-300 space-y-2">
+              <Trophy className="w-8 h-8 text-slate-400 mx-auto" />
+              <p className="font-semibold text-slate-700">No hackathons listed yet.</p>
+              <p className="text-[11px] text-slate-400">
+                Participation in Smart India Hackathon, HackCBS, or dev challenges demonstrates rapid problem solving to top recruiters.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 shadow-2xs transition-colors"
+              >
+                <span>Add Hackathon</span>
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {currentData.hackathons.map((hack, idx) => (
+                <div
+                  key={hack.id || idx}
+                  className="p-4 rounded-xl border border-amber-200/90 bg-gradient-to-br from-white to-amber-50/20 shadow-2xs space-y-2"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                        <Trophy className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h5 className="text-xs font-bold text-slate-900 leading-tight">
+                          {hack.name}
+                        </h5>
+                        {hack.projectName && (
+                          <span className="text-[11px] font-semibold text-blue-700">
+                            Project: {hack.projectName}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {hack.awardOrPosition && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                          {hack.awardOrPosition}
+                        </span>
+                      )}
+                      {hack.date && (
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {hack.date}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {hack.description && (
+                    <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                      {hack.description}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                    {hack.roleOrTeam ? (
+                      <span className="text-slate-500 font-medium">
+                        Role: {hack.roleOrTeam}
+                      </span>
+                    ) : (
+                      <span />
+                    )}
+
+                    {hack.projectUrl && (
+                      <a
+                        href={hack.projectUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>View Project / Demo</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}

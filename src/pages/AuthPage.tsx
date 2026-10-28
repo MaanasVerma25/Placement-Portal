@@ -42,9 +42,14 @@ export const AuthPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // If already logged in, redirect
+  // If already logged in, redirect (or go to profile onboarding if newly signed up)
   useEffect(() => {
     if (user) {
+      if (sessionStorage.getItem("just_created_account") === "true") {
+        sessionStorage.removeItem("just_created_account");
+        navigate("/profile?onboarding=true&new=true", { replace: true });
+        return;
+      }
       const searchParams = new URLSearchParams(location.search);
       const redirectTo = searchParams.get("redirect") || "/";
       navigate(redirectTo, { replace: true });
@@ -105,8 +110,10 @@ export const AuthPage: React.FC = () => {
           return;
         }
 
+        sessionStorage.setItem("just_created_account", "true");
         const { error, user: newUser } = await signUpWithPassword(email, password, fullName);
         if (error) {
+          sessionStorage.removeItem("just_created_account");
           const msg = error.message || "Failed to create account.";
           setStatusMessage({ type: "error", text: msg });
           toast.error("Registration Failed", { description: msg });
@@ -122,9 +129,9 @@ export const AuthPage: React.FC = () => {
             });
           } else {
             toast.success("Account created and verified!", {
-              description: `Welcome to JSS Placement Hub`,
+              description: `Welcome! Setting up your placement profile`,
             });
-            navigate("/");
+            navigate("/profile?onboarding=true&new=true");
           }
         }
       } else if (mode === "magiclink") {

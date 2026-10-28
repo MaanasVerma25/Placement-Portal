@@ -14,7 +14,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { StudentProfileModal } from "@/components/profile/StudentProfileModal";
+
 import {
   formatFileSize,
   downloadResumeFile,
@@ -27,7 +27,7 @@ export const StudentUserMenu: React.FC = () => {
   const { user, student, resume, isResumeLoading, uploadResume, signOut, isLoading } =
     useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const quickFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -317,20 +317,7 @@ export const StudentUserMenu: React.FC = () => {
                 <span className="text-[10px] text-blue-500 font-bold">Open →</span>
               </Link>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  setIsProfileModalOpen(true);
-                }}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:text-blue-700 hover:bg-white border border-transparent hover:border-slate-200 transition-all text-left shadow-2xs"
-              >
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-slate-500" />
-                  <span>Quick Modal & Resume</span>
-                </div>
-                <span className="text-[10px] text-slate-400">Dossier →</span>
-              </button>
+
 
               <button
                 type="button"
@@ -345,11 +332,7 @@ export const StudentUserMenu: React.FC = () => {
         )}
       </div>
 
-      {/* Full Profile & Resume Modal */}
-      <StudentProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-      />
+
     </>
   );
 };

@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS public.candidate_profiles (
   email TEXT NOT NULL,
   phone TEXT,
   headline TEXT,
+  preferred_role TEXT,
   summary TEXT,
   location TEXT,
   linkedin_url TEXT,
@@ -69,11 +70,18 @@ CREATE TABLE IF NOT EXISTS public.candidate_profiles (
   projects JSONB DEFAULT '[]'::jsonb,
   experience JSONB DEFAULT '[]'::jsonb,
   certifications JSONB DEFAULT '[]'::jsonb,
+  hackathons JSONB DEFAULT '[]'::jsonb,
+  resume_file_name TEXT,
   extracted_at TIMESTAMPTZ DEFAULT NOW(),
   extraction_source TEXT DEFAULT 'direct_text',
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT candidate_profiles_user_id_key UNIQUE (user_id)
 );
+
+-- Ensure columns exist if table was already created
+ALTER TABLE public.candidate_profiles ADD COLUMN IF NOT EXISTS preferred_role TEXT;
+ALTER TABLE public.candidate_profiles ADD COLUMN IF NOT EXISTS hackathons JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.candidate_profiles ADD COLUMN IF NOT EXISTS resume_file_name TEXT;
 
 ALTER TABLE public.candidate_profiles ENABLE ROW LEVEL SECURITY;
 
