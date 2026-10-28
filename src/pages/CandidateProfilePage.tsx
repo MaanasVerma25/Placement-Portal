@@ -134,6 +134,7 @@ export const CandidateProfilePage: React.FC = () => {
           </Link>
           <span className="text-slate-300">|</span>
           <div className="flex items-center gap-2">
+            <img src="/jss-logo.png" alt="JSS University" className="w-7 h-7 rounded-[6px] object-contain shadow-xs" />
             <h1 className="text-sm font-bold text-slate-900 font-heading">
               Candidate Placement Profile
             </h1>

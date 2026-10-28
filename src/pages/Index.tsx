@@ -3,6 +3,7 @@ import { Search, X, RefreshCw, AlertCircle } from "lucide-react";
 import { useCompanies } from "@/lib/companyApi";
 import { CompanyCard } from "@/components/CompanyCard";
 import { StudentUserMenu } from "@/components/auth/StudentUserMenu";
+import { HeroSlideshow } from "@/components/HeroSlideshow";
 
 const COLLEGE_NAME = "JSS UNIVERSITY";
 const COLLEGE_SHORT = "JSS";
@@ -71,9 +72,11 @@ export const Index: React.FC = () => {
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#d2d2d7]">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[8px] bg-[#1d1d1f] text-white flex items-center justify-center font-heading font-bold text-[12px] tracking-wider select-none">
-              {COLLEGE_SHORT}
-            </div>
+            <img
+              src="/jss-logo.png"
+              alt="JSS University Logo"
+              className="w-8 h-8 rounded-[8px] object-contain shadow-xs select-none"
+            />
             <div className="flex flex-col">
               <span className="font-heading font-semibold text-[15px] tracking-tight text-[#1d1d1f] leading-none">
                 {COLLEGE_NAME}
@@ -90,49 +93,59 @@ export const Index: React.FC = () => {
         </div>
       </header>
 
-      {/* 2. Compact hero section & 3. Wide search field */}
-      <section className="bg-white border-b border-[#d2d2d7] py-10 sm:py-14">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-left">
-          {/* Muted eyebrow label */}
-          <p className="text-[13px] font-medium text-[#6e6e73] mb-2 tracking-normal">
-            Campus Recruitment · 2025–2026
-          </p>
+      {/* 2. Hero section with right-side media slideshow & 3. Wide search field */}
+      <section className="bg-white border-b border-[#d2d2d7] py-10 sm:py-16">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 text-left">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left side: Eyebrow, Heading, Subtitle, Search Field */}
+            <div className="lg:col-span-7">
+              {/* Muted eyebrow label */}
+              <p className="text-[14px] sm:text-[15px] font-medium text-[#6e6e73] mb-3 tracking-normal">
+                Campus Recruitment · 2025–2026
+              </p>
 
-          {/* Large two-line heading (48px / 34px mobile, tight line height, tracking tight) */}
-          <h1 className="text-[34px] sm:text-[48px] font-[650] sm:font-[700] text-[#1d1d1f] leading-[1.08] tracking-[-0.015em] max-w-[850px]">
-            {COLLEGE_NAME} Companies Research &amp; Placement Analytics Portal
-          </h1>
+              {/* Large two-line heading (52px / 48px / 36px mobile, tight line height, tracking tight) */}
+              <h1 className="text-[36px] sm:text-[48px] lg:text-[52px] font-[650] sm:font-[700] text-[#1d1d1f] leading-[1.06] tracking-[-0.02em]">
+                {COLLEGE_NAME} Companies Research &amp; Placement Analytics Portal
+              </h1>
 
-          {/* One short supporting sentence */}
-          <p className="mt-3 text-[16px] text-[#6e6e73] font-normal max-w-[650px] leading-relaxed">
-            Your strategic edge for campus placements
-          </p>
+              {/* One short supporting sentence */}
+              <p className="mt-4 text-[17px] sm:text-[18px] text-[#6e6e73] font-normal max-w-[640px] leading-relaxed">
+                Your strategic edge for campus placements
+              </p>
 
-          {/* 3. Wide search field immediately below hero */}
-          <div className="mt-6 max-w-[720px] relative">
-            <div className="relative flex items-center">
-              <Search
-                className="w-4 h-4 text-[#6e6e73] absolute left-3.5 pointer-events-none"
-                aria-hidden="true"
-              />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by company name, technology, headquarters, or role..."
-                className="w-full pl-10 pr-10 py-3 text-[14px] sm:text-[15px] rounded-[12px] bg-[#f5f5f7] border border-[#d2d2d7] text-[#1d1d1f] placeholder:text-[#6e6e73] focus:outline-none focus:bg-white focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 transition-all duration-150"
-                aria-label="Search recruiting companies"
-              />
-              {searchTerm && (
-                <button
-                  type="button"
-                  onClick={() => setSearchTerm("")}
-                  className="absolute right-3 p-1 rounded-full text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#e8e8ed] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]"
-                  aria-label="Clear search"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+              {/* 3. Wide search field immediately below hero */}
+              <div className="mt-7 max-w-[640px] relative">
+                <div className="relative flex items-center">
+                  <Search
+                    className="w-4.5 h-4.5 text-[#6e6e73] absolute left-3.5 pointer-events-none"
+                    aria-hidden="true"
+                  />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search by company name, technology, headquarters, or role..."
+                    className="w-full pl-11 pr-11 py-3.5 text-[15px] sm:text-[16px] rounded-[12px] bg-[#f5f5f7] border border-[#d2d2d7] text-[#1d1d1f] placeholder:text-[#6e6e73] focus:outline-none focus:bg-white focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 transition-all duration-150"
+                    aria-label="Search recruiting companies"
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-3.5 p-1 rounded-full text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#e8e8ed] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]"
+                      aria-label="Clear search"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right side: Slideshow of images & video */}
+            <div className="lg:col-span-5 w-full">
+              <HeroSlideshow />
             </div>
           </div>
         </div>

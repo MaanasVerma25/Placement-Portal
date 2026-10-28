@@ -285,6 +285,7 @@ export const JdComparisonPage: React.FC = () => {
           </Link>
           <span className="text-slate-300">|</span>
           <div className="flex items-center gap-2">
+            <img src="/jss-logo.png" alt="JSS University" className="w-7 h-7 rounded-[6px] object-contain shadow-xs" />
             <Briefcase className="w-4 h-4 text-indigo-600" />
             <h1 className="text-sm font-bold text-slate-900 font-heading">
               Job Description (JD) Intelligence & Side-by-Side Match

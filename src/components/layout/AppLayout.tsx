@@ -28,8 +28,13 @@ const AppHeader: React.FC = () => {
 
         {/* Enterprise Breadcrumb */}
         <nav className="flex items-center text-xs sm:text-sm font-medium text-slate-500" aria-label="Breadcrumb">
-          <Link to="/" className="hover:text-blue-600 transition-colors">
-            Companies
+          <Link to="/" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+            <img
+              src="/jss-logo.png"
+              alt="JSS"
+              className="w-4 h-4 rounded object-contain shrink-0"
+            />
+            <span>Companies</span>
           </Link>
           <ChevronRight className="w-4 h-4 mx-1.5 text-slate-400 shrink-0" />
           <span className="text-slate-800 font-semibold truncate max-w-[140px] sm:max-w-xs">
@@ -44,7 +49,11 @@ const AppHeader: React.FC = () => {
 
       <div className="flex items-center gap-2.5">
         <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+          <img
+            src="/jss-logo.png"
+            alt="JSS"
+            className="w-3.5 h-3.5 rounded object-contain shrink-0"
+          />
           JSS Placement Intelligence
         </span>
         <StudentUserMenu />

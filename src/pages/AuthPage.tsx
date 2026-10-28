@@ -180,9 +180,11 @@ export const AuthPage: React.FC = () => {
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#d2d2d7]">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[8px] bg-[#1d1d1f] text-white flex items-center justify-center font-heading font-bold text-[12px] tracking-wider select-none">
-              JSS
-            </div>
+            <img
+              src="/jss-logo.png"
+              alt="JSS University Logo"
+              className="w-8 h-8 rounded-[8px] object-contain shadow-xs select-none"
+            />
             <div className="flex flex-col text-left">
               <span className="font-heading font-semibold text-[15px] tracking-tight text-[#1d1d1f] leading-none">
                 JSS UNIVERSITY
@@ -208,9 +210,21 @@ export const AuthPage: React.FC = () => {
         <div className="max-w-[480px] w-full bg-white rounded-[18px] border border-[#d2d2d7] p-8 sm:p-10 shadow-[0_2px_12px_rgba(0,0,0,0.04)] text-left">
           {/* Header & Title */}
           <div className="mb-6">
-            <p className="text-[13px] font-medium text-[#6e6e73] mb-1">
-              Student Authentication Portal
-            </p>
+            <div className="flex items-center gap-3 mb-3">
+              <img
+                src="/jss-logo.png"
+                alt="JSS University Logo"
+                className="w-10 h-10 rounded-[8px] object-contain shadow-xs"
+              />
+              <div>
+                <p className="text-[13px] font-semibold text-[#1d1d1f] tracking-tight">
+                  JSS UNIVERSITY NOIDA
+                </p>
+                <p className="text-[11px] text-[#6e6e73]">
+                  Placement Intelligence Portal
+                </p>
+              </div>
+            </div>
             <h1 className="text-[28px] font-semibold text-[#1d1d1f] tracking-tight leading-tight">
               Sign in with your College ID
             </h1>
@@ -304,7 +318,11 @@ export const AuthPage: React.FC = () => {
           {/* Live Student Card Preview */}
           {parsedStudent.isValidStudentFormat && (
             <div className="p-3.5 rounded-[12px] bg-[#eef8f1] border border-[#d0edd8] text-[13px] text-[#248a3d] mb-6 flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#248a3d] mt-0.5 shrink-0" aria-hidden="true" />
+              <img
+                src="/jss-logo.png"
+                alt="JSS"
+                className="w-5 h-5 rounded object-contain mt-0.5 shrink-0"
+              />
               <div>
                 <span className="font-semibold block">JSS Verified Student Identity</span>
                 <span className="text-[12px] opacity-90 block mt-0.5">

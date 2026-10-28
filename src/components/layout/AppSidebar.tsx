@@ -93,16 +93,21 @@ export const AppSidebar: React.FC = () => {
         } lg:translate-x-0 lg:static`}
       >
         {/* Top Header / Wordmark */}
-        <div className="h-16 px-5 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F8FAFC]">
-          <Link to="/" className="flex flex-col text-left group">
-            <div className="flex items-center gap-1.5">
-              <span className="font-heading font-extrabold text-sm tracking-wider text-slate-900 group-hover:text-blue-600 transition-colors">
+        <div className="h-16 px-4 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F8FAFC]">
+          <Link to="/" className="flex items-center gap-2.5 text-left group">
+            <img
+              src="/jss-logo.png"
+              alt="JSS University Logo"
+              className="w-8 h-8 rounded-[6px] object-contain shrink-0 shadow-xs"
+            />
+            <div className="flex flex-col">
+              <span className="font-heading font-extrabold text-sm tracking-wider text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">
                 JSS UNIVERSITY
               </span>
+              <span className="inline-flex items-center text-[10px] font-bold text-blue-600 tracking-wider">
+                INTELLIGENCE PLATFORM
+              </span>
             </div>
-            <span className="inline-flex items-center text-[10px] font-bold text-blue-600 tracking-wider">
-              JSS · INTELLIGENCE PLATFORM
-            </span>
           </Link>
 
           {isMobile && (

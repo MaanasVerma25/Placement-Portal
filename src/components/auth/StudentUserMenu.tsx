@@ -160,9 +160,12 @@ export const StudentUserMenu: React.FC = () => {
             {/* Header Card */}
             <div className="p-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white text-left">
               <div className="flex items-center justify-between mb-2">
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                  <ShieldCheck className="w-3 h-3" /> JSS Verified
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <img src="/jss-logo.png" alt="JSS" className="w-4 h-4 rounded object-contain shrink-0" />
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                    <ShieldCheck className="w-3 h-3" /> JSS Verified
+                  </span>
+                </div>
                 <span className="text-[10px] text-slate-400 font-mono">
                   {student?.admissionYear
                     ? `Batch of ${student.admissionYear}`
