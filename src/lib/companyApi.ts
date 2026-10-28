@@ -30,36 +30,48 @@ export interface SkillWithRoadmap extends DashboardSkill {
 /**
  * Fetch companies list from public.company_json.
  * Uses short_json mapped through normalizeCompanySummary.
+ * Automatically falls back to SEED_COMPANIES if network or Supabase query encounters issues.
  */
 export async function fetchCompanies(): Promise<CompanyListItem[]> {
-  if (!isSupabaseConfigured) {
-    // Documented fallback when .env is not yet populated
-    return SEED_COMPANIES.map((sc) => ({
+  const seedFallback = () =>
+    SEED_COMPANIES.map((sc) => ({
       ...normalizeCompanySummary(sc.short_json),
       company_id: sc.company_id,
       short_json: sc.short_json,
     }));
+
+  if (!isSupabaseConfigured) {
+    return seedFallback();
   }
 
-  const { data, error } = await supabase
-    .from("company_json")
-    .select("company_id, short_json")
-    .order("company_id", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("company_json")
+      .select("company_id, short_json")
+      .order("company_id", { ascending: true });
 
-  if (error) {
-    console.error("Error fetching companies from company_json:", error);
-    throw error;
+    if (error) {
+      console.warn("Supabase company query notice (falling back to seed companies):", error);
+      return seedFallback();
+    }
+
+    if (!data || data.length === 0) {
+      return seedFallback();
+    }
+
+    return (data || []).map((row: any) => {
+      const shortJson = (row.short_json as Record<string, any>) || {};
+      const summary = normalizeCompanySummary(shortJson);
+      return {
+        ...summary,
+        company_id: Number(row.company_id),
+        short_json: shortJson,
+      };
+    });
+  } catch (err) {
+    console.warn("Network or client error fetching from Supabase, using seed fallback:", err);
+    return seedFallback();
   }
-
-  return (data || []).map((row: any) => {
-    const shortJson = (row.short_json as Record<string, any>) || {};
-    const summary = normalizeCompanySummary(shortJson);
-    return {
-      ...summary,
-      company_id: Number(row.company_id),
-      short_json: shortJson,
-    };
-  });
 }
 
 /**
@@ -69,7 +81,7 @@ export async function fetchCompanies(): Promise<CompanyListItem[]> {
 export async function fetchCompanyProfile(
   companyId: number
 ): Promise<CompanyProfileDetail> {
-  if (!isSupabaseConfigured) {
+  const seedFallback = () => {
     const match =
       SEED_COMPANIES.find((c) => c.company_id === companyId) || SEED_COMPANIES[0];
     const profile = normalizeCompanyProfile(match.full_json, match.short_json);
@@ -81,31 +93,40 @@ export async function fetchCompanyProfile(
       full_json: match.full_json,
       summary,
     };
-  }
-
-  const { data, error } = await supabase
-    .from("company_json")
-    .select("company_id, short_json, full_json")
-    .eq("company_id", companyId)
-    .single();
-
-  if (error) {
-    console.error(`Error fetching company profile for company_id ${companyId}:`, error);
-    throw error;
-  }
-
-  const shortJson = (data.short_json as Record<string, any>) || {};
-  const fullJson = (data.full_json as Record<string, any>) || {};
-  const profile = normalizeCompanyProfile(fullJson, shortJson);
-  const summary = normalizeCompanySummary(shortJson);
-
-  return {
-    ...profile,
-    company_id: Number(data.company_id),
-    short_json: shortJson,
-    full_json: fullJson,
-    summary,
   };
+
+  if (!isSupabaseConfigured) {
+    return seedFallback();
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("company_json")
+      .select("company_id, short_json, full_json")
+      .eq("company_id", companyId)
+      .single();
+
+    if (error || !data) {
+      console.warn(`Company profile query notice for ${companyId}, using fallback:`, error);
+      return seedFallback();
+    }
+
+    const shortJson = (data.short_json as Record<string, any>) || {};
+    const fullJson = (data.full_json as Record<string, any>) || {};
+    const profile = normalizeCompanyProfile(fullJson, shortJson);
+    const summary = normalizeCompanySummary(shortJson);
+
+    return {
+      ...profile,
+      company_id: Number(data.company_id),
+      short_json: shortJson,
+      full_json: fullJson,
+      summary,
+    };
+  } catch (err) {
+    console.warn(`Exception fetching company profile for company_id ${companyId}, using fallback:`, err);
+    return seedFallback();
+  }
 }
 
 /**
@@ -119,7 +140,7 @@ export async function fetchCompanyProfile(
 export async function fetchCompanySkills(
   companyId: number
 ): Promise<SkillWithRoadmap[]> {
-  if (!isSupabaseConfigured) {
+  const seedFallback = () => {
     const match =
       SEED_COMPANIES.find((c) => c.company_id === companyId) || SEED_COMPANIES[0];
     const normalized = normalizeDashboardSkills(match.skill_levels);
@@ -127,54 +148,55 @@ export async function fetchCompanySkills(
       ...skill,
       topics: getSkillTopics(skill.skill_set_id),
     }));
+  };
+
+  if (!isSupabaseConfigured) {
+    return seedFallback();
   }
 
-  // 1. Fetch company_skill_levels for this company
-  const { data: skillLevelsData, error: slError } = await supabase
-    .from("company_skill_levels")
-    .select("company_id, skill_set_id, required_level, required_proficiency_level_id")
-    .eq("company_id", companyId);
+  try {
+    // 1. Fetch company_skill_levels for this company
+    const { data: skillLevelsData, error: slError } = await supabase
+      .from("company_skill_levels")
+      .select("company_id, skill_set_id, required_level, required_proficiency_level_id")
+      .eq("company_id", companyId);
 
-  if (slError) {
-    console.error(`Error fetching company_skill_levels for company_id ${companyId}:`, slError);
-    throw slError;
-  }
+    if (slError) {
+      console.warn(`Notice fetching company_skill_levels for company_id ${companyId}, using fallback:`, slError);
+      return seedFallback();
+    }
 
-  if (!skillLevelsData || skillLevelsData.length === 0) {
-    return [];
-  }
+    if (!skillLevelsData || skillLevelsData.length === 0) {
+      return seedFallback();
+    }
 
-  const skillSetIds = Array.from(
-    new Set(skillLevelsData.map((row: any) => Number(row.skill_set_id)))
-  );
+    const skillSetIds = Array.from(
+      new Set(skillLevelsData.map((row: any) => Number(row.skill_set_id)))
+    );
 
-  // 2, 3, 4. Fetch the 3 supporting tables in parallel
-  const [masterRes, profRes, topicsRes] = await Promise.all([
-    supabase
-      .from("skill_set_master")
-      .select("skill_set_id, skill_set_name, short_name")
-      .in("skill_set_id", skillSetIds),
-    supabase
-      .from("proficiency_levels")
-      .select("proficiency_level_id, proficiency_name, proficiency_code"),
-    supabase
-      .from("skill_set_topics")
-      .select("skill_set_id, level_number, topics")
-      .in("skill_set_id", skillSetIds),
-  ]);
+    // 2, 3, 4. Fetch the 3 supporting tables in parallel
+    const [masterRes, profRes, topicsRes] = await Promise.all([
+      supabase
+        .from("skill_set_master")
+        .select("skill_set_id, skill_set_name, short_name")
+        .in("skill_set_id", skillSetIds),
+      supabase
+        .from("proficiency_levels")
+        .select("proficiency_level_id, proficiency_name, proficiency_code"),
+      supabase
+        .from("skill_set_topics")
+        .select("skill_set_id, level_number, topics")
+        .in("skill_set_id", skillSetIds),
+    ]);
 
-  if (masterRes.error) {
-    console.error("Error fetching skill_set_master:", masterRes.error);
-    throw masterRes.error;
-  }
-  if (profRes.error) {
-    console.error("Error fetching proficiency_levels:", profRes.error);
-    throw profRes.error;
-  }
-  if (topicsRes.error) {
-    console.error("Error fetching skill_set_topics:", topicsRes.error);
-    throw topicsRes.error;
-  }
+    if (masterRes.error || profRes.error || topicsRes.error) {
+      console.warn("Notice fetching supporting skill tables, using fallback:", {
+        master: masterRes.error,
+        prof: profRes.error,
+        topics: topicsRes.error,
+      });
+      return seedFallback();
+    }
 
   // Lookup maps
   const skillMasterMap = new Map<number, string>();
@@ -237,6 +259,10 @@ export async function fetchCompanySkills(
     ...skill,
     topics: topicsMap.get(skill.skill_set_id) || [],
   }));
+  } catch (err) {
+    console.warn(`Exception in fetchCompanySkills for ${companyId}, using fallback:`, err);
+    return seedFallback();
+  }
 }
 
 // React Query Hooks
