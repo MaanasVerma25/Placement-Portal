@@ -55,7 +55,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = memo(({ company }) => {
             websiteUrl={sj.website_url}
             size="md"
           />
-          <CategoryBadge category={sj.company_type || "Standard"} />
+          <CategoryBadge category={company.company_type || sj.company_type || "Standard"} />
         </div>
 
         {/* Name and Short Name */}

@@ -35,7 +35,7 @@ export const Index: React.FC = () => {
       Regular: 0,
     };
     companies.forEach((item) => {
-      const type = item.short_json?.company_type || item.company_type || "Standard";
+      const type = item.company_type || item.short_json?.company_type || "Standard";
       if (c[type] !== undefined) {
         c[type] += 1;
       }
@@ -47,8 +47,9 @@ export const Index: React.FC = () => {
   const filteredCompanies = useMemo(() => {
     return companies.filter((company) => {
       const sj = company.short_json || company;
+      const compType = company.company_type || sj.company_type || "Standard";
       const matchesCategory =
-        selectedCategory === "All" || sj.company_type === selectedCategory;
+        selectedCategory === "All" || compType === selectedCategory;
 
       const q = debouncedSearch.toLowerCase().trim();
       if (!q) return matchesCategory;
@@ -58,6 +59,7 @@ export const Index: React.FC = () => {
         (sj.short_name && sj.short_name.toLowerCase().includes(q)) ||
         (sj.category && sj.category.toLowerCase().includes(q)) ||
         (sj.headquarters_address && sj.headquarters_address.toLowerCase().includes(q)) ||
+        (sj.office_locations && sj.office_locations.toLowerCase().includes(q)) ||
         (sj.operating_countries && sj.operating_countries.toLowerCase().includes(q));
 
       return matchesCategory && matchesQuery;

@@ -28,9 +28,58 @@ export interface SkillWithRoadmap extends DashboardSkill {
 }
 
 /**
+ * Categorize recruiting organizations into standard university placement tiers
+ * when explicit company_type is not present in raw JSON.
+ */
+export function deriveCompanyTier(
+  shortJson: Record<string, any>,
+  fullJson: Record<string, any>
+): "Super Dream" | "Dream" | "Standard" | "Regular" {
+  if (shortJson.company_type) return shortJson.company_type;
+  if (fullJson.company_type) return fullJson.company_type;
+
+  const name = String(shortJson.name || "").toLowerCase();
+  const cat = String(shortJson.category || fullJson.category || "").toLowerCase();
+
+  // Super Dream: Tier-1 Big Tech, AI & High-Frequency Engineering
+  const superDreamKeywords = [
+    "google", "apple", "microsoft", "amazon", "meta", "nvidia", "netflix",
+    "adobe", "uber", "salesforce", "oracle", "snowflake", "databricks", "stripe",
+    "spacex", "openai", "qualcomm", "intel", "amd"
+  ];
+  if (superDreamKeywords.some((k) => name.includes(k))) {
+    return "Super Dream";
+  }
+
+  // Dream: Global Financial Institutions, Major Product SaaS, Scale-ups & GCCs
+  const dreamKeywords = [
+    "fractal", "bank", "goldman", "morgan", "financial", "fintech",
+    "wealth", "investment", "credit", "paypal", "visa", "mastercard",
+    "samsung", "cisco", "atlassian", "twilio", "intuit", "walmart",
+    "bloomberg", "airbus", "boeing"
+  ];
+  if (
+    dreamKeywords.some((k) => name.includes(k)) ||
+    cat.includes("fintech") ||
+    cat.includes("banking") ||
+    cat.includes("scale-up") ||
+    cat.includes("unicorn")
+  ) {
+    return "Dream";
+  }
+
+  // Regular: Startups, Specialized SMBs, and EdTech
+  if (cat.includes("startup") || cat.includes("smb") || cat.includes("edtech")) {
+    return "Regular";
+  }
+
+  // Standard: Established Enterprise IT Services, Consulting, and Engineering
+  return "Standard";
+}
+
+/**
  * Fetch companies list from public.company_json.
- * Uses short_json mapped through normalizeCompanySummary.
- * Automatically falls back to SEED_COMPANIES if network or Supabase query encounters issues.
+ * Uses short_json & full_json mapped through normalizeCompanySummary.
  */
 export async function fetchCompanies(): Promise<CompanyListItem[]> {
   const seedFallback = () =>
@@ -47,7 +96,7 @@ export async function fetchCompanies(): Promise<CompanyListItem[]> {
   try {
     const { data, error } = await supabase
       .from("company_json")
-      .select("company_id, short_json")
+      .select("company_id, short_json, full_json")
       .order("company_id", { ascending: true });
 
     if (error) {
@@ -61,11 +110,27 @@ export async function fetchCompanies(): Promise<CompanyListItem[]> {
 
     return (data || []).map((row: any) => {
       const shortJson = (row.short_json as Record<string, any>) || {};
-      const summary = normalizeCompanySummary(shortJson);
+      const fullJson = (row.full_json as Record<string, any>) || {};
+
+      const derivedType = deriveCompanyTier(shortJson, fullJson);
+      const resolvedHq =
+        shortJson.headquarters_address ||
+        fullJson.headquarters_address ||
+        (shortJson.office_locations ? shortJson.office_locations.split(";")[0].trim() : "Global");
+
+      const enrichedShort = {
+        ...shortJson,
+        company_type: shortJson.company_type || fullJson.company_type || derivedType,
+        headquarters_address: resolvedHq,
+        website_url: shortJson.website_url || fullJson.website_url || "",
+      };
+
+      const summary = normalizeCompanySummary(enrichedShort);
       return {
         ...summary,
         company_id: Number(row.company_id),
-        short_json: shortJson,
+        short_json: enrichedShort,
+        full_json: fullJson,
       };
     });
   } catch (err) {
