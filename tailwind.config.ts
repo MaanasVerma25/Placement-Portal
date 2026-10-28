@@ -13,9 +13,33 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ["Outfit", "sans-serif"],
-        body: ["Inter", "sans-serif"],
-        sans: ["Inter", "sans-serif"],
+        heading: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"SF Pro Display"',
+          '"SF Pro Text"',
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif",
+        ],
+        body: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"SF Pro Text"',
+          '"SF Pro Display"',
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif",
+        ],
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"SF Pro Text"',
+          '"SF Pro Display"',
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif",
+        ],
       },
       colors: {
         border: "hsl(var(--border))",

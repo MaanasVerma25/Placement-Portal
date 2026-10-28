@@ -32,10 +32,10 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const primarySrc = logoDevUrl || logoUrl;
 
   const sizeClasses = {
-    sm: "w-8 h-8 text-xs rounded-lg",
-    md: "w-11 h-11 text-base rounded-xl",
-    lg: "w-14 h-14 text-xl rounded-xl",
-    xl: "w-18 h-18 text-2xl rounded-2xl",
+    sm: "w-8 h-8 text-xs rounded-[8px]",
+    md: "w-[44px] h-[44px] text-[16px] rounded-[10px]",
+    lg: "w-14 h-14 text-xl rounded-[12px]",
+    xl: "w-18 h-18 text-2xl rounded-[16px]",
   }[size];
 
   const firstLetter = (name || "C").trim().charAt(0).toUpperCase();
@@ -43,7 +43,8 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   if (!primarySrc || imageError) {
     return (
       <div
-        className={`flex items-center justify-center font-heading font-bold bg-slate-100 text-slate-700 border border-slate-200 shadow-sm shrink-0 select-none ${sizeClasses} ${className}`}
+        className={`flex items-center justify-center font-heading font-semibold bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7] shrink-0 select-none ${sizeClasses} ${className}`}
+        aria-hidden="true"
       >
         {firstLetter}
       </div>
@@ -52,12 +53,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
 
   return (
     <div
-      className={`relative flex items-center justify-center bg-white border border-slate-200 overflow-hidden shadow-xs shrink-0 ${sizeClasses} ${className}`}
+      className={`relative flex items-center justify-center bg-white border border-[#d2d2d7] overflow-hidden shrink-0 ${sizeClasses} ${className}`}
     >
       <img
         src={primarySrc}
         alt={`${name} logo`}
-        className="w-full h-full object-contain p-1.5 transition-transform duration-200 hover:scale-105"
+        className="w-full h-full object-contain p-1.5 transition-transform duration-200 motion-reduce:transition-none hover:scale-105"
         onError={() => {
           if (logoDevUrl && primarySrc === logoDevUrl && logoUrl) {
             // fallback to logoUrl first if logoDevUrl failed

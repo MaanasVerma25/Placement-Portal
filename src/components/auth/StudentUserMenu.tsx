@@ -93,16 +93,15 @@ export const StudentUserMenu: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="w-20 h-8 rounded-lg bg-slate-100 animate-pulse" />;
+    return <div className="w-24 h-9 rounded-[12px] bg-[#f5f5f7] animate-pulse" />;
   }
 
   if (!user) {
     return (
       <Link
         to="/login"
-        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
+        className="inline-flex items-center justify-center px-4 py-2 rounded-[12px] text-[14px] font-medium bg-[#0071e3] hover:bg-[#0077ed] active:bg-[#006edb] text-white transition-colors duration-150 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-2"
       >
-        <GraduationCap className="w-4 h-4" />
         <span>Student Login</span>
       </Link>
     );

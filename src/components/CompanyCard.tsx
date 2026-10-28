@@ -14,93 +14,114 @@ export const CompanyCard: React.FC<CompanyCardProps> = memo(({ company }) => {
   const navigate = useNavigate();
   const { selectCompany } = useCompany();
 
-  const sj = company.short_json;
+  const sj = company.short_json || company;
 
   const handleClick = () => {
     // 1. Save selected-company to localStorage (handled in selectCompany)
     // 2. Update CompanyContext
     selectCompany(company);
-    // 3. Navigate to /company/intelligence
+    // 3. Navigate to /company/intelligence (redirects unauthenticated users to /login?redirect=...)
     navigate("/company/intelligence");
   };
 
   const renderTextOrFallback = (val: any) => {
     if (isNullish(val)) {
-      return <span className="italic text-slate-400">not publicly available</span>;
+      return <span className="text-[#6e6e73]">Not publicly available</span>;
     }
-    return <span>{val}</span>;
+    return <span className="text-[#1d1d1f] font-normal">{val}</span>;
   };
 
-  const isGrowthNegative = sj.yoy_growth_rate && sj.yoy_growth_rate.trim().startsWith("-");
+  const hasGrowth = !isNullish(sj.yoy_growth_rate);
+  const isGrowthNegative = hasGrowth && String(sj.yoy_growth_rate).trim().startsWith("-");
+  const compType = company.company_type || sj.company_type || "Standard";
+
+  const brandSubtitle =
+    sj.short_name && sj.short_name !== sj.name
+      ? sj.short_name
+      : sj.category || "Enterprise";
 
   return (
     <div
       onClick={handleClick}
       role="button"
       tabIndex={0}
+      aria-label={`Explore placement intelligence for ${sj.name || "recruiting company"}`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           handleClick();
         }
       }}
-      className="group relative flex flex-col justify-between p-5 bg-white rounded-xl border border-slate-200/90 hover:border-blue-400/80 hover:shadow-md transition-all duration-200 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+      className="group relative flex flex-col justify-between p-6 bg-white rounded-[18px] border border-[#d2d2d7] hover:border-[#b0b0b5] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 motion-reduce:transition-none motion-reduce:transform-none cursor-pointer text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-2"
     >
       <div>
-        {/* Header row: Logo & Category badge */}
-        <div className="flex items-start justify-between gap-3 mb-3.5">
+        {/* Top row: 44px Company Logo on left, placement-tier badge on right */}
+        <div className="flex items-start justify-between gap-3 mb-4">
           <CompanyLogo
             name={sj.name}
             logoUrl={sj.logo_url}
             websiteUrl={sj.website_url}
             size="md"
           />
-          <CategoryBadge category={company.company_type || sj.company_type || "Standard"} />
+          <CategoryBadge category={compType} />
         </div>
 
-        {/* Name and Short Name */}
+        {/* Company Name & Brand Subtitle */}
         <div className="mb-4">
-          <h3 className="font-heading font-semibold text-lg text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+          <h3
+            className="text-[18px] font-semibold text-[#1d1d1f] group-hover:text-[#0071e3] transition-colors line-clamp-2 leading-snug"
+            title={sj.name}
+          >
             {sj.name}
           </h3>
-          <p className="text-xs text-slate-500 font-medium">
-            {sj.short_name && sj.short_name !== sj.name ? sj.short_name : sj.category || "Enterprise"}
+          <p
+            className="text-[13px] text-[#6e6e73] font-normal mt-1 line-clamp-1"
+            title={brandSubtitle}
+          >
+            {brandSubtitle}
           </p>
         </div>
 
-        {/* Metadata info: HQ, Size, Growth */}
-        <div className="space-y-2 text-xs text-slate-600 mb-4">
+        {/* Metadata info: Headquarters, Employee count, YoY Growth */}
+        <div className="space-y-2 text-[13px] text-[#6e6e73] mb-4">
           <div className="flex items-center gap-2">
-            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <MapPin className="w-3.5 h-3.5 text-[#6e6e73] shrink-0" aria-hidden="true" />
             <span className="truncate">{renderTextOrFallback(sj.headquarters_address)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <Users className="w-3.5 h-3.5 text-[#6e6e73] shrink-0" aria-hidden="true" />
             <span className="truncate">{renderTextOrFallback(sj.employee_size)}</span>
           </div>
           <div className="flex items-center gap-2">
-            {isGrowthNegative ? (
-              <TrendingDown className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+            {hasGrowth ? (
+              <>
+                {isGrowthNegative ? (
+                  <TrendingDown className="w-3.5 h-3.5 text-rose-600 shrink-0" aria-hidden="true" />
+                ) : (
+                  <TrendingUp className="w-3.5 h-3.5 text-[#248a3d] shrink-0" aria-hidden="true" />
+                )}
+                <span
+                  className={`font-medium ${
+                    isGrowthNegative ? "text-rose-600" : "text-[#248a3d]"
+                  }`}
+                >
+                  {sj.yoy_growth_rate} YoY
+                </span>
+              </>
             ) : (
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <>
+                <TrendingUp className="w-3.5 h-3.5 text-[#6e6e73] shrink-0" aria-hidden="true" />
+                <span className="text-[#6e6e73]">Growth: Not publicly available</span>
+              </>
             )}
-            <span
-              className={`font-medium ${
-                isGrowthNegative ? "text-rose-600" : "text-emerald-700"
-              }`}
-            >
-              {renderTextOrFallback(sj.yoy_growth_rate)} YoY
-            </span>
           </div>
         </div>
       </div>
 
-      {/* Footer CTA */}
-      <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors">
+      {/* Footer CTA: Subtle divider and blue Explore Intelligence action */}
+      <div className="pt-4 border-t border-[#f0f0f2] flex items-center justify-between text-[14px] font-medium text-[#0071e3] group-hover:text-[#0077ed] transition-colors">
         <span>Explore Intelligence</span>
-        <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
-          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-        </div>
+        <ArrowRight className="w-4 h-4 text-[#0071e3] group-hover:text-[#0077ed] group-hover:translate-x-1 transition-transform motion-reduce:transform-none" aria-hidden="true" />
       </div>
     </div>
   );

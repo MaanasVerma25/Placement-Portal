@@ -20,20 +20,13 @@ export const CategoryBadge: React.FC<{ category: string; className?: string }> =
   category,
   className = "",
 }) => {
-  const meta = CATEGORY_COLORS[category] || {
-    bg: "bg-slate-50",
-    text: "text-slate-700",
-    border: "border-slate-200",
-    hex: "#475569",
-  };
-
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${meta.bg} ${meta.text} ${meta.border} ${className}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#eef8f1] text-[#248a3d] border border-[#d0edd8] tracking-normal select-none ${className}`}
     >
       <span
-        className="w-1.5 h-1.5 rounded-full mr-1.5 shrink-0"
-        style={{ backgroundColor: meta.hex }}
+        className="w-1.5 h-1.5 rounded-full mr-1.5 shrink-0 bg-[#248a3d]"
+        aria-hidden="true"
       />
       {category}
     </span>

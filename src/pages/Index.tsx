@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Search, X, Building2, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { Search, X, RefreshCw, AlertCircle } from "lucide-react";
 import { useCompanies } from "@/lib/companyApi";
 import { CompanyCard } from "@/components/CompanyCard";
-import { CATEGORY_COLORS } from "@/components/Badges";
 import { StudentUserMenu } from "@/components/auth/StudentUserMenu";
 
 const COLLEGE_NAME = "JSS UNIVERSITY";
@@ -25,7 +24,7 @@ export const Index: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Compute counts for filter pills
+  // Compute counts for filter segmented control
   const counts = useMemo(() => {
     const c: Record<string, number> = {
       All: companies.length,
@@ -67,221 +66,238 @@ export const Index: React.FC = () => {
   }, [companies, debouncedSearch, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-body flex flex-col">
-      {/* Top Navbar */}
-      <header className="border-b border-[#E5E7EB] bg-white sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <div className="min-h-screen bg-white text-[#1d1d1f] font-body flex flex-col selection:bg-[#0071e3] selection:text-white">
+      {/* 1. Slim, sticky top navigation bar */}
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#d2d2d7]">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-[8px] bg-[#1d1d1f] text-white flex items-center justify-center font-heading font-bold text-[12px] tracking-wider select-none">
+              {COLLEGE_SHORT}
+            </div>
             <div className="flex flex-col">
-              <span className="font-heading font-extrabold text-base sm:text-lg tracking-wider text-slate-900">
+              <span className="font-heading font-semibold text-[15px] tracking-tight text-[#1d1d1f] leading-none">
                 {COLLEGE_NAME}
               </span>
-              <span className="text-[10px] font-bold text-blue-600 tracking-wider">
-                {COLLEGE_SHORT} · INTELLIGENCE PLATFORM
+              <span className="text-[11px] text-[#6e6e73] font-normal tracking-normal mt-0.5">
+                Placement Intelligence Hub
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>Phase 1 Verified</span>
-            </span>
             <StudentUserMenu />
           </div>
         </div>
       </header>
 
-      {/* Hero Section: Clean white background, bottom border, large heading, small subtitle, search directly below */}
-      <section className="bg-white border-b border-[#E5E7EB] py-10 sm:py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            {/* Pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 mb-4">
-              <Building2 className="w-3.5 h-3.5 text-blue-600" />
-              <span>{COLLEGE_SHORT} · INTELLIGENCE PLATFORM</span>
-            </div>
+      {/* 2. Compact hero section & 3. Wide search field */}
+      <section className="bg-white border-b border-[#d2d2d7] py-10 sm:py-14">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-left">
+          {/* Muted eyebrow label */}
+          <p className="text-[13px] font-medium text-[#6e6e73] mb-2 tracking-normal">
+            Campus Recruitment · 2025–2026
+          </p>
 
-            {/* H1 Heading */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-slate-900 tracking-tight leading-tight">
-              {COLLEGE_NAME} Companies Research &amp; Placement Analytics Portal
-            </h1>
+          {/* Large two-line heading (48px / 34px mobile, tight line height, tracking tight) */}
+          <h1 className="text-[34px] sm:text-[48px] font-[650] sm:font-[700] text-[#1d1d1f] leading-[1.08] tracking-[-0.015em] max-w-[850px]">
+            {COLLEGE_NAME} Companies Research &amp; Placement Analytics Portal
+          </h1>
 
-            {/* Subtitle */}
-            <p className="mt-3 text-base sm:text-lg text-slate-600 font-normal">
-              Your strategic edge for campus placements
-            </p>
+          {/* One short supporting sentence */}
+          <p className="mt-3 text-[16px] text-[#6e6e73] font-normal max-w-[650px] leading-relaxed">
+            Your strategic edge for campus placements
+          </p>
 
-            {/* Search Input directly below */}
-            <div className="mt-8 relative max-w-2xl">
-              <div className="relative flex items-center">
-                <Search className="w-5 h-5 text-slate-400 absolute left-4 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by company name, technology, headquarters, or role..."
-                  className="w-full pl-11 pr-10 py-3.5 text-sm sm:text-base rounded-xl border border-slate-300 bg-white shadow-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                />
-                {searchTerm && (
-                  <button
-                    onClick={() => setSearchTerm("")}
-                    className="absolute right-3.5 p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-                    aria-label="Clear search"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
+          {/* 3. Wide search field immediately below hero */}
+          <div className="mt-6 max-w-[720px] relative">
+            <div className="relative flex items-center">
+              <Search
+                className="w-4 h-4 text-[#6e6e73] absolute left-3.5 pointer-events-none"
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by company name, technology, headquarters, or role..."
+                className="w-full pl-10 pr-10 py-3 text-[14px] sm:text-[15px] rounded-[12px] bg-[#f5f5f7] border border-[#d2d2d7] text-[#1d1d1f] placeholder:text-[#6e6e73] focus:outline-none focus:bg-white focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 transition-all duration-150"
+                aria-label="Search recruiting companies"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 p-1 rounded-full text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#e8e8ed] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Content: Filters + Company Grid */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filter Pills with exact category colors & live counts */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar">
-          {CATEGORIES.map((cat) => {
-            const isSelected = selectedCategory === cat;
-            const count = counts[cat] || 0;
-            const color =
-              cat === "All"
-                ? null
-                : CATEGORY_COLORS[cat] || null;
+      {/* 4. Segmented Control & 5. Company Grid */}
+      <main className="flex-1 max-w-[1200px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 text-left">
+        {/* Rounded Segmented Control for filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+          <div
+            role="tablist"
+            aria-label="Filter companies by placement category"
+            className="p-1 rounded-[12px] bg-[#f5f5f7] border border-[#d2d2d7] inline-flex items-center gap-1 max-w-full overflow-x-auto no-scrollbar"
+          >
+            {CATEGORIES.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              const count = counts[cat] || 0;
+              const isDisabled = count === 0 && cat !== "All";
 
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all shrink-0 ${
-                  isSelected
-                    ? "bg-slate-900 text-white border-slate-900 shadow-xs"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                }`}
-              >
-                {color && (
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: color.hex }}
-                  />
-                )}
-                <span>{cat}</span>
-                <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                    isSelected
-                      ? "bg-white/20 text-white"
-                      : "bg-slate-100 text-slate-600"
+              return (
+                <button
+                  key={cat}
+                  role="tab"
+                  aria-selected={isSelected}
+                  disabled={isDisabled}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[8px] text-[13px] transition-all shrink-0 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] ${
+                    isDisabled
+                      ? "opacity-40 cursor-not-allowed text-[#6e6e73]"
+                      : isSelected
+                      ? "bg-white text-[#1d1d1f] font-medium shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+                      : "text-[#6e6e73] hover:text-[#1d1d1f] font-normal"
                   }`}
                 >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  <span>{cat}</span>
+                  <span
+                    className={`text-[12px] ${
+                      isSelected
+                        ? "text-[#1d1d1f] font-medium"
+                        : count > 0
+                        ? "text-[#6e6e73]"
+                        : "text-[#b0b0b5]"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Results Count Summary */}
-        <div className="mt-2 mb-6 flex items-center justify-between text-xs text-slate-500">
-          <span>
-            Showing <strong className="text-slate-900 font-semibold">{filteredCompanies.length}</strong>{" "}
-            recruiting {filteredCompanies.length === 1 ? "organization" : "organizations"}
-          </span>
+          {/* Reset Filters action if query or filter is active */}
           {(searchTerm || selectedCategory !== "All") && (
             <button
+              type="button"
               onClick={() => {
                 setSearchTerm("");
                 setSelectedCategory("All");
               }}
-              className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium"
+              className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#0071e3] hover:text-[#0077ed] hover:underline transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]"
             >
-              <RefreshCw className="w-3 h-3" />
-              Reset filters
+              <RefreshCw className="w-3 h-3" aria-hidden="true" />
+              <span>Reset filters</span>
             </button>
           )}
         </div>
 
-        {/* Company Grid / Loading / Error / Empty states */}
+        {/* 5. Result count beneath filters in secondary text */}
+        <div className="mt-3 mb-6 text-[13px] text-[#6e6e73]">
+          Showing <span className="text-[#1d1d1f] font-medium">{filteredCompanies.length}</span>{" "}
+          recruiting {filteredCompanies.length === 1 ? "organization" : "organizations"}
+        </div>
+
+        {/* 5 & 9. Responsive Company Grid (3 cols on wide screens, 2 on tablet, 1 on mobile) / Skeletons / States */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={idx}
-                className="p-5 bg-white rounded-xl border border-slate-200/90 animate-pulse space-y-4"
+                className="p-6 bg-white rounded-[18px] border border-[#d2d2d7] animate-pulse space-y-4"
               >
                 <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 bg-slate-100 rounded-lg" />
-                  <div className="w-16 h-5 bg-slate-100 rounded-full" />
+                  <div className="w-[44px] h-[44px] bg-[#f5f5f7] rounded-[10px]" />
+                  <div className="w-20 h-5 bg-[#f5f5f7] rounded-full" />
                 </div>
-                <div className="space-y-2">
-                  <div className="h-5 bg-slate-100 rounded w-3/4" />
-                  <div className="h-3 bg-slate-100 rounded w-1/2" />
+                <div className="space-y-2 pt-1">
+                  <div className="h-5 bg-[#f5f5f7] rounded w-3/4" />
+                  <div className="h-3.5 bg-[#f5f5f7] rounded w-1/2" />
                 </div>
-                <div className="space-y-2 pt-2">
-                  <div className="h-3 bg-slate-100 rounded w-full" />
-                  <div className="h-3 bg-slate-100 rounded w-4/5" />
-                  <div className="h-3 bg-slate-100 rounded w-2/3" />
+                <div className="space-y-2.5 pt-2">
+                  <div className="h-3.5 bg-[#f5f5f7] rounded w-full" />
+                  <div className="h-3.5 bg-[#f5f5f7] rounded w-4/5" />
+                  <div className="h-3.5 bg-[#f5f5f7] rounded w-2/3" />
+                </div>
+                <div className="pt-4 border-t border-[#f0f0f2] flex items-center justify-between">
+                  <div className="h-3.5 bg-[#f5f5f7] rounded w-28" />
+                  <div className="w-4 h-4 bg-[#f5f5f7] rounded" />
                 </div>
               </div>
             ))}
           </div>
         ) : isError ? (
-          <div className="py-14 text-center bg-rose-50/50 rounded-2xl border border-rose-200 max-w-md mx-auto p-6">
-            <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
-              <AlertCircle className="w-5 h-5" />
+          <div className="py-16 text-center bg-[#f5f5f7] rounded-[18px] border border-[#d2d2d7] max-w-[500px] mx-auto p-8">
+            <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3 border border-rose-200">
+              <AlertCircle className="w-5 h-5" aria-hidden="true" />
             </div>
-            <h3 className="text-base font-heading font-semibold text-rose-900">
-              Unable to load companies
+            <h3 className="text-[18px] font-semibold text-[#1d1d1f]">
+              Unable to load recruiting companies
             </h3>
-            <p className="text-xs text-rose-600 mt-1 max-w-xs mx-auto">
-              {error instanceof Error ? error.message : "Failed to load recruiting companies. Check database connection."}
+            <p className="text-[13px] text-[#6e6e73] mt-1.5 max-w-sm mx-auto leading-relaxed">
+              {error instanceof Error
+                ? error.message
+                : "A temporary network or database issue occurred. Please retry your request."}
             </p>
             <button
+              type="button"
               onClick={() => refetch()}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 shadow-xs transition-colors"
+              className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-[12px] bg-[#0071e3] text-white text-[13px] font-medium hover:bg-[#0077ed] active:bg-[#006edb] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Retry</span>
             </button>
           </div>
         ) : filteredCompanies.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCompanies.map((company) => (
               <CompanyCard key={company.company_id} company={company} />
             ))}
           </div>
         ) : (
-          /* Empty State */
-          <div className="py-16 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 max-w-lg mx-auto">
-            <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-heading font-semibold text-slate-800">
-              No matching companies found
+          /* Helpful No-Results State */
+          <div className="py-16 text-center bg-[#f5f5f7] rounded-[18px] border border-[#d2d2d7] max-w-[500px] mx-auto p-8">
+            <h3 className="text-[18px] font-semibold text-[#1d1d1f]">
+              No companies found
             </h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-              We couldn't find any organizations matching "{debouncedSearch}". Try searching for another name or reset filters.
+            <p className="text-[13px] text-[#6e6e73] mt-1.5 max-w-xs mx-auto leading-relaxed">
+              {debouncedSearch
+                ? `No organizations match "${debouncedSearch}". Try checking your spelling or clearing filters.`
+                : "No organizations found in the selected placement category."}
             </p>
             <button
+              type="button"
               onClick={() => {
                 setSearchTerm("");
                 setSelectedCategory("All");
               }}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 shadow-xs transition-colors"
+              className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-[12px] bg-[#0071e3] text-white text-[13px] font-medium hover:bg-[#0077ed] active:bg-[#006edb] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Reset Search &amp; Filters</span>
+              <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Clear Search &amp; Filters</span>
             </button>
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[#E5E7EB] bg-[#F8FAFC] py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4">
-          <p className="font-medium text-slate-600">
-            {COLLEGE_NAME} Placement Intelligence Hub
-          </p>
-          <p className="mt-1 text-slate-400">
-            Enterprise campus placement analytics and research platform · Phase 1 (UI-only)
+      {/* University Footer */}
+      <footer className="border-t border-[#d2d2d7] bg-white py-8 text-center text-[12px] text-[#6e6e73] mt-auto">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-[#1d1d1f]">{COLLEGE_NAME}</span>
+            <span className="text-[#d2d2d7]">·</span>
+            <span>Placement Intelligence Hub</span>
+          </div>
+          <p className="text-[#6e6e73]">
+            Institutional recruitment analytics platform · Strict privacy compliance enforced
           </p>
         </div>
       </footer>
