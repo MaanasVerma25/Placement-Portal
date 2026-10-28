@@ -13,6 +13,7 @@ import { AuthCallback } from "@/pages/AuthCallback";
 import { CompanyIntelligence } from "@/pages/CompanyIntelligence";
 import { SkillIntelligence } from "@/pages/SkillIntelligence";
 import { CandidateProfilePage } from "@/pages/CandidateProfilePage";
+import { JdComparisonPage } from "@/pages/JdComparisonPage";
 import { NotFound } from "@/pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -71,6 +72,19 @@ export function App() {
                         <CandidateProfilePage />
                       </ProtectedRoute>
                     }
+                  />
+
+                  <Route
+                    path="/jd-compare"
+                    element={
+                      <ProtectedRoute>
+                        <JdComparisonPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/enter-a-jd"
+                    element={<Navigate to="/jd-compare" replace />}
                   />
 
                   <Route path="*" element={<NotFound />} />

@@ -12,6 +12,8 @@ import {
   User,
   CheckCircle2,
   RefreshCw,
+  Briefcase,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -305,6 +307,22 @@ export const StudentUserMenu: React.FC = () => {
 
             {/* Actions: View Profile & Sign Out */}
             <div className="p-2 bg-slate-50/50 space-y-1">
+              <Link
+                to="/jd-compare"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-indigo-700 bg-indigo-50/60 hover:bg-indigo-50 border border-indigo-200/80 transition-all text-left shadow-2xs group"
+                id="student-menu-enter-jd"
+              >
+                <div className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-indigo-600 group-hover:scale-105 transition-transform" />
+                  <span>enter a JD</span>
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-indigo-600 font-bold bg-indigo-100/80 px-1.5 py-0.5 rounded">
+                  <Sparkles className="w-2.5 h-2.5" />
+                  Match AI →
+                </span>
+              </Link>
+
               <Link
                 to="/profile"
                 onClick={() => setIsOpen(false)}

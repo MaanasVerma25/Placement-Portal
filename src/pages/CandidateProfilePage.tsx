@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   Target,
   Lock,
+  Briefcase,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileView } from "@/components/profile/CandidateProfileView";
@@ -142,6 +143,13 @@ export const CandidateProfilePage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5">
+          <Link
+            to="/jd-compare"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors shadow-2xs"
+          >
+            <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Enter a JD</span>
+          </Link>
           <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
             <Database className="w-3.5 h-3.5" />
             Supabase DB Synced
