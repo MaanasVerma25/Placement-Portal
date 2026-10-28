@@ -14,6 +14,7 @@ import { useCompanySkills, SkillWithRoadmap } from "@/lib/companyApi";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import { BloomBadge, CriticalityBadge, BLOOM_COLORS } from "@/components/Badges";
 import { BloomLevel, DashboardSkill } from "@/lib/companyData";
+import { CompanyRadixComparator } from "@/components/profile/CompanyRadixComparator";
 
 const BLOOM_LEGEND = [
   {
@@ -232,6 +233,7 @@ const SkillCard: React.FC<{
 
 export const SkillIntelligence: React.FC = () => {
   const { selectedCompany, summary: contextSummary } = useCompany();
+  const [showComparator, setShowComparator] = useState(false);
   const companyId = selectedCompany?.company_id;
   const {
     data: skills = [],
@@ -349,7 +351,18 @@ export const SkillIntelligence: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setShowComparator(!showComparator)}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 shadow-xs transition-all active:scale-95 cursor-pointer"
+                id="skill-intelligence-compare-button"
+              >
+                <Target className="w-4 h-4" />
+                <span>
+                  {showComparator ? "Hide Profile Bar Comparison" : "Compare My Profile with Bar"}
+                </span>
+              </button>
+              <span className="hidden sm:inline-flex px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
                 {skills.length} Evaluated Skills
               </span>
             </div>
@@ -358,6 +371,20 @@ export const SkillIntelligence: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Profile vs Company Bar Comparator Section */}
+        {showComparator && (
+          <div className="animate-in fade-in slide-in-from-top-2 duration-200 pb-2">
+            <CompanyRadixComparator
+              initialCompanyId={companyId}
+              initialCompanySkills={skills}
+              initialCompanyMeta={
+                companyId && summary
+                  ? { ...summary, company_id: companyId }
+                  : undefined
+              }
+            />
+          </div>
+        )}
         {/* Bloom 5-Column Taxonomy Legend */}
         <section>
           <div className="flex items-center gap-2 mb-3">

@@ -27,6 +27,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileView } from "@/components/profile/CandidateProfileView";
 import { ManualProfileForm } from "@/components/profile/ManualProfileForm";
+import { CompanyRadixComparator } from "@/components/profile/CompanyRadixComparator";
 import {
   formatFileSize,
   downloadResumeFile,
@@ -143,6 +144,13 @@ export const CandidateProfilePage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5">
+          <a
+            href="#company-bar-comparator"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors shadow-2xs"
+          >
+            <Target className="w-3.5 h-3.5 text-blue-600" />
+            <span>Company Bar Gap</span>
+          </a>
           <Link
             to="/jd-compare"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors shadow-2xs"
@@ -437,6 +445,11 @@ export const CandidateProfilePage: React.FC = () => {
               hasResume={Boolean(resume)}
             />
           )}
+        </div>
+
+        {/* Company Expected Bar & 12 RADIX Gap Analysis */}
+        <div id="company-bar-comparator" className="pt-2">
+          <CompanyRadixComparator />
         </div>
       </main>
     </div>
